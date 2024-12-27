@@ -6,7 +6,6 @@ import (
 	baseresponse "gin-gorm/src/utils/baseResponse"
 	"gin-gorm/src/utils/handler"
 	"gin-gorm/src/utils/logger"
-	"strconv"
 
 	// "gin-gorm/utils/logger"
 	"net/http"
@@ -23,7 +22,7 @@ import (
 
 type Service struct {}
 func (Service) GetAllUser(ctx *gin.Context) {
-	var users []UserListResp
+	var users []UserListResp 
 
 	err := database.DB.Table("users").Find(&users).Error
 
@@ -34,6 +33,7 @@ func (Service) GetAllUser(ctx *gin.Context) {
 		return
 	}
 
+	logger.Info("value", "p", users)
 	ctx.JSON(http.StatusOK, baseresponse.BaseSuccessResponse[[]UserListResp]{
 		Message: "success",
 		Success: true,
@@ -44,7 +44,7 @@ func (Service) GetAllUser(ctx *gin.Context) {
 func (Service) GetById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	idUint, errId := strconv.ParseUint(id, 10, 32)
+	idUint, errId := handler.CheckID(id)
 	if errId != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message" : "id must be a valid uint",
@@ -52,10 +52,9 @@ func (Service) GetById(ctx *gin.Context) {
 		return
 	}
 
-	newId := uint(idUint)
 
 	var user UserDetailResp
-	err := database.DB.Table("users").Where("id = ?", newId).Find(&user).Error
+	err := database.DB.Table("users").Where("id = ?", idUint).Find(&user).Error
 
 	logger.Debug("data", "user", err)
 

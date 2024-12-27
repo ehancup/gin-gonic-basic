@@ -13,28 +13,26 @@ type UserListResp struct {
 	ID       *uint      `json:"id"`
 	Name     *string    `json:"name"`
 	Email    *string    `json:"email"`
-	Address  *string    `json:"address"`
-	BornDate *time.Time `json:"born_date"`
+	// Address  *string    `json:"address"`
+	// BornDate *time.Time `json:"born_date"`
 }
 
 type UserDetailResp struct {
-	ID       *uint      `json:"id"`
-	Name     *string    `json:"name"`
-	Email    *string    `json:"email"`
+	UserListResp
 	Address  *string    `json:"address"`
 	BornDate *time.Time `json:"born_date"`
 }
 
 // Request
 
-type UserCreateReq struct {
+type UserReq struct {
 	Name     string `json:"name" g:"required,min=3"`
 	Email    string `json:"email" g:"required,email"`
 	Address  string `json:"address" g:"required"`
 	BornDate string `json:"born_date" g:"required"`
 }
 
-func (v UserCreateReq) ToEntity() (dao.UserEntity, error) {
+func (v UserReq) ToEntity() (dao.UserEntity, error) {
 
 	parsedTime, err := time.Parse("2006-01-02", v.BornDate)
 	if err != nil {
@@ -46,6 +44,10 @@ func (v UserCreateReq) ToEntity() (dao.UserEntity, error) {
 		Email:    v.Email,
 		BornDate: parsedTime,
 	}, nil
+}
+
+type UserCreateReq struct {
+	UserReq
 }
 
 // Validation (DTO)

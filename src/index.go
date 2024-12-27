@@ -23,8 +23,9 @@ func BoostrapApp() {
 
     appCfg := config.GetConfig().App
     if appCfg.Mode == "debug" {
+        logger.Info("debug mode")
         log.SetLevel(log.DebugLevel)
-        gin.SetMode(gin.DebugMode)
+        // gin.SetMode(gin.DebugMode)
     } else {
         gin.SetMode(gin.ReleaseMode)
     }
