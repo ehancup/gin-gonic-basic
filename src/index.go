@@ -14,6 +14,7 @@ import (
 )
 
 func BoostrapApp() {
+    // testing
 
     err := godotenv.Load()
     
