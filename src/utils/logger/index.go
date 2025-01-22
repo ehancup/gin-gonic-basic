@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	logger *log.Logger
+	Log *log.Logger
 )
 
 func init() {
-	logger = log.NewWithOptions(os.Stderr, log.Options{
+	Log = log.NewWithOptions(os.Stderr, log.Options{
 		ReportCaller: false,
 		ReportTimestamp: true,
 		TimeFormat: "2006/01/02 15:04",
@@ -20,8 +20,10 @@ func init() {
 
 	})
 
+	
 	styles := GetStyles()
-	logger.SetStyles(styles)
+	Log.SetStyles(styles)
+	
 }
 
 func Debug(message string, args ...interface{}) {
@@ -36,7 +38,7 @@ func Debug(message string, args ...interface{}) {
 		}
 	}
 
-	logger.Debug(message, args...)
+	Log.Debug(message, args...)
 }
 func Info(message string, args ...interface{}) {
 	for i := 0; i < len(args); i++ {
@@ -48,7 +50,7 @@ func Info(message string, args ...interface{}) {
 			}
 		}
 	}
-	logger.Info(message, args...)
+	Log.Info(message, args...)
 }
 func Error(message string, args ...interface{}) {
 	for i := 0; i < len(args); i++ {
@@ -60,7 +62,7 @@ func Error(message string, args ...interface{}) {
 			}
 		}
 	}
-	logger.Error(message, args...)
+	Log.Error(message, args...)
 }
 func Warn(message string, args ...interface{}) {
 	for i := 0; i < len(args); i++ {
@@ -72,7 +74,7 @@ func Warn(message string, args ...interface{}) {
 			}
 		}
 	}
-	logger.Warn(message, args...)
+	Log.Warn(message, args...)
 }
 func Fatal(message string, args ...interface{}) {
 	for i := 0; i < len(args); i++ {
@@ -84,5 +86,5 @@ func Fatal(message string, args ...interface{}) {
 			}
 		}
 	}
-	logger.Fatal(message, args...)
+	Log.Fatal(message, args...)
 }

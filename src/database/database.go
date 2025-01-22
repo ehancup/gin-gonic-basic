@@ -5,6 +5,7 @@ import (
 	// "gin-gorm/app/models"
 	"gin-gorm/config"
 	"gin-gorm/src/database/dao"
+
 	// "gin-gorm/src/app/users"
 	"gin-gorm/src/utils/logger"
 
@@ -28,12 +29,12 @@ func ConnectDatabase() {
 		logger.Fatal("Cant connect to database")
 	}
 	// log.Println("connected to database")
-	logger.Info("connected to database", "driver",dbCfg.Driver )
+	logger.Info("connected to database", "driver", dbCfg.Driver)
 
 }
 
 func Migrate() {
-	err := DB.AutoMigrate(&dao.UserEntity{})
+	err := DB.AutoMigrate(&dao.UserEntity{}, &dao.BookEntity{})
 
 	if err != nil {
 		logger.Fatal("Migration Failed", "err", err.Error())

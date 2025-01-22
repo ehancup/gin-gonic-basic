@@ -9,4 +9,5 @@ func main() {
 	// logrus.SetFormatter(&logrus.TextFormatter{})
     // logrus.SetLevel(logrus.InfoLevel)
 	b.BoostrapApp()
+	
 }

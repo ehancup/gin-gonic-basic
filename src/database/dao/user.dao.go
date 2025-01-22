@@ -9,9 +9,10 @@ import (
 // Entity
 
 type UserEntity struct {
+	ID       *uint     `gorm:"primarykey"`
 	gorm.Model
-	Name     string    `gorm:"size:255;uniqueIndex;not null;"`
-	Email    string    `gorm:"size:255;not null;"`
+	Name     string    `gorm:"size:255;not null;"`
+	Email    string    `gorm:"size:255;not null;uniqueIndex"`
 	Address  string    `gorm:"size:255;not null;"`
 	BornDate time.Time `gorm:"column:born_date;not null;"`
 }
@@ -19,3 +20,4 @@ type UserEntity struct {
 func (UserEntity) TableName() string {
 	return "users"
 }
+
