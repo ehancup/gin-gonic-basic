@@ -24,7 +24,16 @@ import (
 
 type Service struct{}
 
+// @Summary Add a new pet to the store
+// @Description get string by ID
+// @ID get-string-by-int
+// @Accept  json
+// @Produce  json
+// @Param   some_id     path    int     true        "Some ID"
+// @Success 200 {string} string  "ok"
+// @Router /string/{some_id} [get]
 func (Service) GetAllUser(ctx *gin.Context) {
+
 	var (
 		users     []UserListResp
 		totalUser int64

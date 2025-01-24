@@ -13,6 +13,9 @@ import (
 	"github.com/joho/godotenv"
 
 	"flag"
+
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/files"
 )
 
 func BoostrapApp() {
@@ -49,7 +52,12 @@ func BoostrapApp() {
 
 	app.Use(gin.Recovery())
 
+	// url := ginSwagger.URL("http://localhost:3010/swagger/doc.json")
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	InitRoute(app)
+
+	app.Static("/public", "./public")
 
 	if err := app.Run(appCfg.Port); err != nil {
 		logger.Fatal("[ERR] fail starting servr :", "err", err)
