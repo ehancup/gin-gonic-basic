@@ -1,24 +1,296 @@
+basePath: /v1
+definitions:
+  auth.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.RegisterReq:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  br.BaseSuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  br.BaseSuccessResponsePagination:
+    properties:
+      data: {}
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/br.PaginationResponse'
+      success:
+        example: true
+        type: boolean
+    type: object
+  br.PaginationResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  users.UserCreateReq:
+    properties:
+      address:
+        type: string
+      born_date:
+        type: string
+      email:
+        type: string
+      name:
+        minLength: 3
+        type: string
+    required:
+    - address
+    - born_date
+    - email
+    - name
+    type: object
+  users.UserUpdateReq:
+    properties:
+      address:
+        type: string
+      born_date:
+        type: string
+      email:
+        type: string
+      name:
+        minLength: 3
+        type: string
+    required:
+    - address
+    - born_date
+    - email
+    - name
+    type: object
+host: localhost:3010
 info:
-  contact: {}
+  contact:
+    email: rhanysuf24@gmail.com
+    name: Ehancup
+    url: http://www.swagger.io/support
+  description: This is an API for learning.
+  termsOfService: http://swagger.io/terms/
+  title: Learn Golang gin-gonic REST API
+  version: "1.0"
 paths:
-  /string/{some_id}:
-    get:
+  /login:
+    post:
       consumes:
       - application/json
-      description: get string by ID
-      operationId: get-string-by-int
+      description: Login with credential
       parameters:
-      - description: Some ID
+      - description: Login Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Login
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register with credential
+      parameters:
+      - description: Register Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Register
+      tags:
+      - auth
+  /upload/single:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload Single File with formData
+      parameters:
+      - description: file will be uploaded
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upload Single File
+      tags:
+      - upload
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create new user with payload
+      parameters:
+      - description: Add Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserCreateReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Create user
+      tags:
+      - user
+  /user/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID
+      parameters:
+      - description: User ID
         in: path
-        name: some_id
+        name: id
         required: true
         type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
-      summary: Add a new pet to the store
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Delete User
+      tags:
+      - user
+  /user/detail/{id}:
+    get:
+      consumes:
+      - application/json
+      description: "Getting\tDetail user by id"
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Get Detail user
+      tags:
+      - user
+  /user/list:
+    get:
+      consumes:
+      - application/json
+      description: "Getting\tall user with pagination"
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponsePagination'
+      security:
+      - BearerAuth: []
+      summary: Get All user
+      tags:
+      - user
+  /user/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update existing user with payload
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Add Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/br.BaseSuccessResponse'
+      summary: Update user
+      tags:
+      - user
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

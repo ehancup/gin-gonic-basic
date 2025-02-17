@@ -1,7 +1,7 @@
 package br
 
 import (
-	"gin-gorm/src/utils/logger"
+	// "gin-gorm/src/utils/logger"
 	"math"
 )
 
@@ -17,9 +17,7 @@ type PaginationResponse struct {
 }
 
 func (v Pagination) GetResponse(total int) PaginationResponse {
-	totalPage := math.Ceil(float64(total) / float64(v.PageSize))
-	logger.Info("total page", "data", float64(total))
-	
+	totalPage := math.Ceil(float64(total) / float64(v.PageSize))	
 	return PaginationResponse{
 		Pagination: v,
 		Total: total,

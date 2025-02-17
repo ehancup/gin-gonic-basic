@@ -24,18 +24,23 @@ import (
 
 type Service struct{}
 
-// @Summary Add a new pet to the store
-// @Description get string by ID
-// @ID get-string-by-int
-// @Accept  json
-// @Produce  json
-// @Param   some_id     path    int     true        "Some ID"
-// @Success 200 {string} string  "ok"
-// @Router /string/{some_id} [get]
+// GetAllUser godoc
+//
+//	@Summary		Get All user
+//	@Description	Getting	all user with pagination
+//	@Security		BearerAuth
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			page		query		int	false	"page"
+//	@Param			page_size	query		int	false	"page size"
+//	@Success		200			{object}	br.BaseSuccessResponsePagination
+//	@Router			/user/list [get]
 func (Service) GetAllUser(ctx *gin.Context) {
 
 	var (
 		users     []UserListResp
+		// users     []dao.UserEntity
 		totalUser int64
 	)
 
@@ -45,14 +50,31 @@ func (Service) GetAllUser(ctx *gin.Context) {
 		return
 	}
 
-	err := database.DB.Table("users").Offset((pg.Page - 1) * pg.PageSize).Limit(pg.PageSize).Find(&users).Count(&totalUser).Error
+	err := database.DB.Model(&dao.UserEntity{}).Preload("Book").Count(&totalUser).Offset((pg.Page - 1) * pg.PageSize).Limit(pg.PageSize).Find(&users).Error
 
+	// for k, i := range users {
+	// 	var book []dao.BookEntity
+
+	// 	if err := database.DB.Where("user_id = ?", i.ID).Select("id", "name", "user_id").Find(&book).Error; err != nil {
+	// 		ctx.JSON(handler.Throw500(err.Error()))
+	// 		return
+	// 	}
+
+	// 	users[k].Book = book
+	// }
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "error during select",
 		})
 		return
 	}
+	logger.Debug("total", "data", totalUser)
+	tokenParse, errParse := handler.GetAuthFromToken(ctx)
+	if errParse != nil {
+		ctx.JSON(handler.Throw500(errParse.Error()))
+		return
+	}
+	logger.Debug("acc", "data", tokenParse.Email)
 
 	ctx.JSON(http.StatusOK, br.BaseSuccessResponsePagination{
 		Message:    "success",
@@ -62,6 +84,16 @@ func (Service) GetAllUser(ctx *gin.Context) {
 	})
 }
 
+// GetDetailUser godoc
+//
+//	@Summary		Get Detail user
+//	@Description	Getting	Detail user by id
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"User ID"
+//	@Success		200	{object}	br.BaseSuccessResponse
+//	@Router			/user/detail/{id} [get]
 func (Service) GetById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -100,19 +132,17 @@ func (Service) GetById(ctx *gin.Context) {
 
 }
 
+// CreateUser godoc
+//
+//	@Summary		Create user
+//	@Description	Create new user with payload
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		UserCreateReq	true	"Add Payload"
+//	@Success		201		{object}	br.BaseSuccessResponse
+//	@Router			/user/create [post]
 func (Service) CreateUser(ctx *gin.Context) {
-
-	// var userReq *UserCreateReq
-
-	// if err := ctx.ShouldBindJSON(&userReq); err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{
-	// 		"message": err.Error(),
-	// 	})
-	// 	return
-	// }
-
-	// validate json
-	// handler.Validate(ctx, userReq)
 	userReq := handler.GetBody[UserCreateReq](ctx)
 	if ctx.IsAborted() {
 		return
@@ -154,8 +184,6 @@ func (Service) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	// newBornDate, _ := time.Parse("2006-01-02", userReq.BornDate)
-	// userReq.BornDate = time.str
 	ctx.JSON(http.StatusCreated, br.BaseSuccessResponse{
 		Message: "ok",
 		Success: true,
@@ -163,6 +191,17 @@ func (Service) CreateUser(ctx *gin.Context) {
 	})
 }
 
+// UpdateUser godoc
+//
+//	@Summary		Update user
+//	@Description	Update existing user with payload
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int				true	"User ID"
+//	@Param			payload	body		UserUpdateReq	true	"Add Payload"
+//	@Success		200		{object}	br.BaseSuccessResponse
+//	@Router			/user/update/{id} [put]
 func (Service) UpdateById(ctx *gin.Context) {
 	var (
 		id    uint
@@ -189,16 +228,6 @@ func (Service) UpdateById(ctx *gin.Context) {
 		return
 	}
 
-	// if err := ctx.ShouldBindJSON(&payload); err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{
-	// 		"message": err.Error(),
-	// 	})
-	// 	logger.Error("input error")
-
-	// 	return
-	// }
-
-	// handler.Validate(ctx, payload)
 	payload := handler.GetBody[UserUpdateReq](ctx)
 	if ctx.IsAborted() {
 		return
@@ -232,11 +261,23 @@ func (Service) UpdateById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": upPayload,
+	ctx.JSON(http.StatusOK, br.BaseSuccessResponse{
+		Message: "success",
+		Success: true,
+		Data: upPayload,
 	})
 }
 
+// 	DeleteUser godoc
+// 
+//	@Summary		Delete User
+//	@Description	Delete user by ID
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id					path		int	true	"User ID"
+//	@Success		200					{object}	br.BaseSuccessResponse
+//	@Router			/user/delete/{id}	[delete]
 func (Service) DeleteById(ctx *gin.Context) {
 	var (
 		user dao.UserEntity
@@ -263,7 +304,8 @@ func (Service) DeleteById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"message": "data berhasil di hapus",
+	ctx.JSON(200, br.BaseSuccessResponse{
+		Message: "data berhasil dihapus",
+		Success: true,
 	})
 }

@@ -21,3 +21,8 @@ func Throw500(msg string) (int, gin.H) {
 		"message" : msg,
 	}
 }
+func Throw401(msg string) (int, gin.H) {
+	return http.StatusUnauthorized, gin.H{
+		"message" : msg,
+	}
+}

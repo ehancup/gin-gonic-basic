@@ -3,6 +3,7 @@ package src
 import (
 	// "gin-gorm/app/service"
 
+	"gin-gorm/src/app/auth"
 	"gin-gorm/src/app/book"
 	"gin-gorm/src/app/upload"
 	"gin-gorm/src/app/users"
@@ -16,5 +17,6 @@ func InitRoute(app *gin.Engine) {
 
 	users.InitRoutes(route, GetUserService())
 	book.InitRoutes(route, GetBookService())
+	auth.InitRoutes(route, GetAuthService())
 	upload.InitRoutes(route)
 }

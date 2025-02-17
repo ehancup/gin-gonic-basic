@@ -14,6 +14,7 @@ import (
 
 	"flag"
 
+	_ "gin-gorm/docs"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/files"
 )
@@ -58,6 +59,8 @@ func BoostrapApp() {
 	InitRoute(app)
 
 	app.Static("/public", "./public")
+
+	logger.Info("Check documentation ->", "url", appCfg.Url + "/swagger/index.html")
 
 	if err := app.Run(appCfg.Port); err != nil {
 		logger.Fatal("[ERR] fail starting servr :", "err", err)

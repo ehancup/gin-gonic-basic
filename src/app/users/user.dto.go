@@ -10,12 +10,23 @@ import (
 // Response
 
 type UserListResp struct {
-	ID       *uint      `json:"id"`
-	Name     *string    `json:"name"`
-	Email    *string    `json:"email"`
+	ID    *uint      `json:"id"`
+	Name  *string    `json:"name"`
+	Email *string    `json:"email"`
+	Book  []BookResp `gorm:"foreignKey:UserID" json:"book"`
 }
 
-type UserDetailResp struct {    
+type BookResp struct {
+	ID     *uint   `json:"id"`
+	Name   *string `json:"name"`
+	UserID *uint   `json:"user_id"`
+}
+
+func (BookResp) TableName() string {
+	return "book"
+}
+
+type UserDetailResp struct {
 	UserListResp
 	Address  *string    `json:"address"`
 	BornDate *time.Time `json:"born_date"`
@@ -63,10 +74,8 @@ func (v UserUpdateReq) ToEntity() (dao.UserEntity, error) {
 		Address:  v.Address,
 		Email:    v.Email,
 		BornDate: parsedTime,
-		
 	}, nil
 }
-
 
 // Validation (DTO)
 
